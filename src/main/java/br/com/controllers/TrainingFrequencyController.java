@@ -11,7 +11,7 @@ public class TrainingFrequencyController {
 	TrainingFrequencyDAO trainingFrequency = new TrainingFrequencyDAO();
 
 	public void save(TrainingFrequency obj) {
-
+ 
 		if (obj == null) {
 			throw new ObjectNotFoundException("Insira os dados da frequencia de treino corretamente para poder efetuar o cadastro.");
 		}

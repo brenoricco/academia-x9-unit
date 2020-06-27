@@ -1,6 +1,7 @@
 package br.com.entities;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -41,6 +42,20 @@ public class TrainingFrequency {
 	@OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "training_id", referencedColumnName = "id")
 	private Training training;
+	
+	@Override
+	public String toString() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		
+		String exercisesList = "\n";
+		
+		for (Exercise e : training.getExercises()) {
+			exercisesList = exercisesList + "   Codigo: "+ e.getId() + "   Titulo: " + e.getTitle() + "   Grupo: " + e.getGroup() + "\n";
+		}
+		
+		return "Codigo do treino: " + id + "    Aluno: " + user.getName() + " Data: " + date.format(formatter) +
+				"\nLista de Exercicios: " + exercisesList;
+	}
 
 	@Override
 	public int hashCode() {

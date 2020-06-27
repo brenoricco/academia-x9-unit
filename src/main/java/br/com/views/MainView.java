@@ -14,7 +14,7 @@ public class MainView {
 
 	private static void mainView() {
 		Scanner sc = new Scanner(System.in);
-		
+		 
 		System.out.println("#### BEM VINDO AO GYM PASS FAKE ####");
 		
 		do {

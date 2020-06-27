@@ -16,7 +16,7 @@ public class Program {
 		int op = -1;
 		do {
 			System.out.println("-------- Login --------");
-			System.out.print("CPF:");
+			System.out.print("CPF: ");
 			String cpf = sc.next();
 			System.out.print("Senha: ");
 			String password = sc.next();

@@ -2,13 +2,12 @@ package br.com.views;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import application.localstorage.LocalStorage;
 import br.com.controllers.SessionController;
-import br.com.controllers.TrainingFrequencyController;
 import br.com.controllers.UserController;
 import br.com.controllers.UserTrainingController;
 import br.com.controllers.exceptions.ObjectNotFoundException;
@@ -44,7 +43,7 @@ public class UserTrainingView {
 				break;
 			case 3:
 				UserTrainingView.trainingReportByPeriod(sc);
-				break;	
+				break;
 			default:
 				System.out.println("Opção invalida!");
 				break;
@@ -55,57 +54,52 @@ public class UserTrainingView {
 	}
 
 	private static void trainingReportByPeriod(Scanner sc) {
-		
-		TrainingFrequencyController trainingFrequencyController = new TrainingFrequencyController();
+		UserController userController = new UserController();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-		
+
 		do {
 			System.out.println("--- Relatorio de treinos por periodo ---");
-			
-			System.out.println("\nRelatório de horários com maior fluxo de alunos na academia: ");
-			System.out.println("Informe um periodo: ");
-			System.out.print("De (dd/MM/yyyy HH:mm): ");
-			String startDateStr = sc.nextLine();
-			LocalDateTime startDate = LocalDateTime.parse(startDateStr, formatter);
-			System.out.print("Ate (dd/MM/yyyy HH:mm): ");
-			String endDateStr = sc.nextLine();
-			LocalDateTime endDate = LocalDateTime.parse(endDateStr, formatter);
-			
-			if(SessionController.isStudent()) {
-				List<TrainingFrequency> list =  LocalStorage.user.getTrainings().stream()
-					.filter(t -> t.getDate().isAfter(startDate) && 
-								t.getDate().isBefore(endDate))
-					.collect(Collectors.toList());
+
+			System.out.println("\nRelatório de treinos realizados do alunos: ");
+
+			System.out.println("Informe o cpf do aluno: ");
+			String cpf = sc.next();
+
+			try {
 				
-				if(list.isEmpty()) {
-					System.out.println("\nNenhum treino realizado nesse periodo");
+				User user = userController.findOne(cpf);
+
+				sc.nextLine();
+				System.out.println("Informe um periodo: ");
+				System.out.print("De (dd/MM/yyyy HH:mm): ");
+				String startDateStr = sc.nextLine();
+				LocalDateTime startDate = LocalDateTime.parse(startDateStr, formatter);
+				System.out.print("Ate (dd/MM/yyyy HH:mm): ");
+				String endDateStr = sc.nextLine();
+				LocalDateTime endDate = LocalDateTime.parse(endDateStr, formatter);
+
+				Set<TrainingFrequency> list = user.getTrainings().stream().filter(t -> t.getDate().isAfter(startDate) && t.getDate().isBefore(endDate))
+						.collect(Collectors.toSet());
+
+				if (list.isEmpty()) {
+					System.out.println("\nNenhum treino desse aluno realizado nesse periodo");
 				} else {
-					System.out.println("\nTreinos Realizados no Periodo de " + startDate + " a " + endDate + ": ");
-					list.forEach(t -> System.out.println(t.getTraining()));
+					System.out.println("\nTreinos Realizados no Periodo de " + startDate.format(formatter) + " a " + endDate.format(formatter) + ": ");
+					list.forEach(System.out::println);
 				}
-			} else {
-				trainingFrequencyController.findAll().forEach(System.out::println);
-				
-				List<TrainingFrequency> list = trainingFrequencyController.findAll().stream()
-					.filter(t -> t.getDate().isAfter(startDate) && 
-								t.getDate().isBefore(endDate))
-					.collect(Collectors.toList());
-				
-				if(list.isEmpty()) {
-					System.out.println("\nNenhum treino realizado nesse periodo");
-				} else {
-					System.out.println("\nTreinos Realizados no Periodo de " + startDate + " a " + endDate + ": ");
-					list.forEach(t -> System.out.println(t.getTraining()));
-				}
+
+				System.out.print("Deseja realizar mais alguma busca?\n [1]-SIM [2]-NAO: ");
+				int input = sc.nextInt();
+
+				if (input == 2)
+					break;
+
+			} catch (RuntimeException e) {
+				e.printStackTrace();
 			}
-			
-			System.out.print("Deseja realizar mais alguma busca?\n [1]-SIM [2]-NAO: ");
-			int input = sc.nextInt();
-			
-			if(input == 2) break;
-			
-		} while(true);
-		
+
+		} while (true);
+
 	}
 
 	private static void findTrainingOfDay(Scanner sc) {
@@ -133,8 +127,8 @@ public class UserTrainingView {
 				}
 			} while (true);
 		}
-		
-		if(user.getTrainingPlan().isEmpty()) {
+
+		if (user.getTrainingPlan().isEmpty()) {
 			System.out.println("Nenhum treino cadastrado.");
 		} else {
 			System.out.println("\n------- Treino do dia ---------");
@@ -166,13 +160,13 @@ public class UserTrainingView {
 				}
 			} while (true);
 		}
-		
-		if(user.getTrainingPlan().isEmpty()) {
+
+		if (user.getTrainingPlan().isEmpty()) {
 			System.out.println("Plano de treino não cadastrado.");
 		} else {
 			System.out.println("\n------- Plano De Treino ---------");
 			user.getTrainingPlan().forEach(System.out::println);
-			System.out.println("\n              QUANTIDADE DE TREINOS: " + user.getTrainingPlan().size());
+			System.out.println("              QUANTIDADE DE TREINOS: " + user.getTrainingPlan().size() + "\n");
 		}
 	}
 

@@ -2,7 +2,8 @@ package br.com.controllers;
 
 import java.util.List;
 
-import br.com.controllers.exceptions.ObjectAlreadyExistsException;
+import br.com.controllers.exceptions.ConstraintViolationException;
+import br.com.controllers.exceptions.InvalidInputDataException;
 import br.com.controllers.exceptions.ObjectNotFoundException;
 import br.com.dao.ExerciseDAO;
 import br.com.entities.Exercise;
@@ -12,15 +13,9 @@ public class ExerciseController {
 	ExerciseDAO exerciseDAO = new ExerciseDAO();
 
 	public void create(Exercise exercise) {
-
-		if (exercise == null) {
+		
+		if (exercise == null || exercise.getGroup() == null || exercise.getTitle() == null) {
 			throw new ObjectNotFoundException("Insira os dados do exercicio corretamente para poder efetuar o cadastro.");
-		}
-
-		Exercise gymExerciseExists = exerciseDAO.findOne(exercise.getId());
-
-		if (gymExerciseExists != null) {
-			throw new ObjectAlreadyExistsException("Já existe um exercicio cadastrado com esse titulo.");
 		}
 		
 		exercise.setTitle(exercise.getTitle().toUpperCase());
@@ -32,6 +27,11 @@ public class ExerciseController {
 	}
 
 	public Exercise findOne(Integer id) {
+		
+		if(id == null) {
+			throw new InvalidInputDataException("Informe um id valido");
+		}
+		
 		Exercise GymExercise = exerciseDAO.findOne(id);
 
 		if (GymExercise == null) {
@@ -52,7 +52,7 @@ public class ExerciseController {
 	}
 
 	public void update(Exercise exercise) {
-		if (exercise == null) {
+		if (exercise == null || exercise.getId() == null || exercise.getTitle() == null) {
 			throw new ObjectNotFoundException(
 					"Insira os dados do exercicio corretamente para poder efetuar a alteração.");
 		}
@@ -67,6 +67,13 @@ public class ExerciseController {
 	}
 
 	public void delete(Integer id) {
+		
+		Exercise exercise = findOne(id);
+		
+		if(!exercise.getTrainings().isEmpty()) {
+			throw new ConstraintViolationException("Você não pode deletar um exercicio que possui treinos relacionados a ele");
+		}
+		
 		exerciseDAO.remove(id);
 	}
 }

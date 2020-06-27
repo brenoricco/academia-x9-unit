@@ -13,7 +13,7 @@ import br.com.entities.TrainingFrequency;
 import br.com.entities.User;
 
 public class UserTrainingController {
-
+ 
 	UserDAO userDao = new UserDAO();
 	TrainingFrequencyController frequencyController = new TrainingFrequencyController();
 

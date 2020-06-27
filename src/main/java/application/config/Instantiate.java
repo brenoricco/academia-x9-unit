@@ -14,7 +14,7 @@ import br.com.utils.DateFormat;
 public class Instantiate {
 	
 	public static void main(String[] args) {
-		
+		 
 		UserDAO userDao = new UserDAO();
         User admin = new User("Admin", "000000", "MASCULINO", "admin@gmail.com", "000000", "Centro, 100", DateFormat.stringToLocalDate("20/07/1995"), Profile.ADMIN);
         admin.getPhonesList().add(new Phone("99999999", admin));

@@ -8,8 +8,9 @@ import br.com.entities.enums.Profile;
 public class SessionController {
 
 	private UserController userController = new UserController();
-
+ 
 	public boolean validateLogin(String cpf, String password) {
+		
 		User user = null;
 		
 		try {

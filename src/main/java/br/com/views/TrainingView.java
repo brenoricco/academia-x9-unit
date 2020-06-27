@@ -18,11 +18,11 @@ public class TrainingView {
 	public TrainingView() {
 		TrainingView.mainView();
 	}
-
+ 
 	private static void mainView() {
 
 		Scanner sc = new Scanner(System.in);
-
+ 
 		int op = -1;
 		do {
 			System.out.println("--------Treino<Principal>--------");

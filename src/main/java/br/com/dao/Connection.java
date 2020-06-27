@@ -29,7 +29,7 @@ public class Connection {
 				settings.put(Environment.USER, "sa");
 				settings.put(Environment.PASS, "<Sql1234@1234>");
 				settings.put(Environment.DIALECT, "org.hibernate.dialect.SQLServerDialect");
-				settings.put(Environment.SHOW_SQL, "true");
+				settings.put(Environment.SHOW_SQL, "false");
 				settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 				settings.put(Environment.HBM2DDL_AUTO, "update");
 				configuration.setProperties(settings);

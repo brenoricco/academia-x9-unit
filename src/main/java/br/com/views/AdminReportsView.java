@@ -16,6 +16,7 @@ import br.com.entities.Exercise;
 import br.com.entities.User;
 import br.com.entities.enums.MuscleGroup;
 import br.com.entities.enums.Profile;
+import br.com.utils.DateFormat;
 
 public class AdminReportsView {
 
@@ -33,7 +34,6 @@ public class AdminReportsView {
 			System.out.println("[1]-Relatorio de Alunos");
 			System.out.println("[2]-Relatorio de Instrutores");
 			System.out.println("[3]-Relatorio de Exercicios");
-			System.out.println("[4]-Relatorio de Horarios Com Maior Fluxo de Alunos");
 			System.out.println("[0]-Voltar");
 			System.out.print("Escolha uma opção: ");
 			op = sc.nextInt();
@@ -49,9 +49,6 @@ public class AdminReportsView {
 				break;
 			case 3:
 				AdminReportsView.exercisesReportView(sc);
-				break;
-			case 4:
-				AdminReportsView.frequencyReportView(sc);
 				break;
 			default:
 				System.out.println("Opção invalida.");
@@ -192,7 +189,8 @@ public class AdminReportsView {
 			System.out.println("[1]-Relatorio Geral");
 			System.out.println("[2]-Relatorio de Alunos Aniversariantes do Mes");
 			System.out.println("[3]-Relatorio de Alunos Ausentes");
-			System.out.println("[4]-Relatorio de Alunos Matriculados Por Periodo:");
+			System.out.println("[4]-Relatorio de Novos Alunos Matriculados Por Periodo:");
+			System.out.println("[5]-Relatorio de Horarios Com Maior Fluxo de Alunos");
 			System.out.println("[0]-Voltar");
 			System.out.print("Opção: ");
 			int input = sc.nextInt();
@@ -216,6 +214,9 @@ public class AdminReportsView {
 			case 4:
 				reportNewStudents(sc);
 				break;
+			case 5:
+				frequencyReportView(sc);
+				break;
 
 			default:
 				System.out.println("Opção invalida.");
@@ -228,24 +229,26 @@ public class AdminReportsView {
 
 	private static void reportNewStudents(Scanner sc) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		
-		System.out.println("\nRelatório alunos matriculados por periodo: ");
+
+		sc.nextLine();
+		System.out.println("\nRelatório de horários com maior fluxo de alunos na academia: ");
 		System.out.println("Informe um periodo: ");
-		System.out.print("De (dd/MM/yyyy HH:mm): ");
-		String startDateStr = sc.nextLine();
-		LocalDate startDate = LocalDate.parse(startDateStr, formatter);
-		System.out.print("Ate (dd/MM/yyyy HH:mm): ");
-		String endDateStr = sc.nextLine();
-		LocalDate endDate = LocalDate.parse(endDateStr, formatter);
+		System.out.print("De (dd/MM/yyyy): ");
+		LocalDate startDate = DateFormat.stringToLocalDate(sc.nextLine());
+		System.out.print("Ate (dd/MM/yyyy): ");
+		LocalDate endDate = DateFormat.stringToLocalDate(sc.nextLine());
 
 		List<User> list = findAllUsersByProfile(Profile.STUDENT).stream()
-				.filter(u -> u.getRegisteredAt().isAfter(startDate) && u.getRegisteredAt().isBefore(endDate)).collect(Collectors.toList());
+				.filter(u -> u.getRegisteredAt().isAfter(startDate.minusDays(1))
+						&& u.getRegisteredAt().isBefore(endDate.plusDays(1)))
+				.collect(Collectors.toList());
 
 		if (list.isEmpty()) {
 			System.out.println("Nenhum aluno novo nesse periodo.");
 		}
 
-		System.out.println("Alunos Novos Periodo de " + startDateStr + " a " + endDateStr + ": ");
+		System.out.println(
+				"Alunos Novos Periodo de " + startDate.format(formatter) + " a " + endDate.format(formatter) + ": ");
 		list.forEach(System.out::println);
 		System.out.println("                       TOTAL DE ALUNOS: " + list.size());
 
@@ -260,27 +263,23 @@ public class AdminReportsView {
 
 	private static void reportAbsentStudents(Scanner sc) {
 		do {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			sc.nextLine();
+			System.out.println("\nRelatório de Alunos Ausentes: ");
+			System.out.println("Alunos que treinarao pela ultima a pelo menos x dias atras: ");
+			System.out.print("Informe a quantidade de x dias: ");
+			int x = sc.nextInt();
 			
-			System.out.println("\nRelatório de Ausentes por periodo: ");
-			System.out.println("Informe um periodo: ");
-			
-			System.out.print("De (dd/MM/yyyy HH:mm): ");
-			String startDateStr = sc.nextLine();
-			LocalDate startDate = LocalDate.parse(startDateStr, formatter);
-			
-			System.out.print("Ate (dd/MM/yyyy HH:mm): ");
-			String endDateStr = sc.nextLine();
-			LocalDate endDate = LocalDate.parse(endDateStr, formatter);
-			
-			List<User> activeStudents = findAllUsersByProfile(Profile.STUDENT).stream()
-					.filter(u -> u.getLastTrainingDate().isAfter(startDate) && u.getLastTrainingDate().isBefore(endDate))
+			List<User> list = findAllUsersByProfile(Profile.STUDENT).stream()
+					.filter(u -> u.getLastTrainingDate().isBefore(LocalDate.now().minusDays(x)))
 					.collect(Collectors.toList());
+		
 
-			if (activeStudents.isEmpty()) {
+			if (list.isEmpty()) {
 				System.out.println("Nenhum registro de aluno encontrado nesse periodo");
 			} else {
-				activeStudents.forEach(System.out::println);
+				System.out.println("");
+				list.forEach(System.out::println);
+				System.out.println("                   TOTAL DE ALUNOS AUSENTES: " + list.size());
 			}
 
 			System.out.print("Deseja efetuar outra busca?\n[1]-SIM [2]-NAO: ");

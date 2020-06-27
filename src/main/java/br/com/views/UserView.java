@@ -22,7 +22,7 @@ public class UserView {
 	}
 
 	public static void mainView(Profile profile) {
-
+ 
 		Scanner sc = new Scanner(System.in);
 
 		do {

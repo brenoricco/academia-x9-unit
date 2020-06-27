@@ -38,7 +38,7 @@ public class TrainingController {
 			throw new ObjectNotFoundException(
 					"Insira os dados do treino corretamente para poder efetuar a alteração.");
 		}
-
+ 
 		Training TrainingPlanExists = trainingDAO.findOne(training.getId());
 
 		if (TrainingPlanExists == null) {
